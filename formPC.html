@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff; /* Fondo azul claro */
+      color: #333;
+      padding: 20px;
+    }
+    form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin: auto;
+    }
+    label {
+      font-weight: bold;
+      color: #0056b3;
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="number"], select {
+      width: calc(100% - 24px); /* Ajusta el ancho para que no se salga del contenedor */
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #e7f0ff;
+      color: #0056b3;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .checkbox-group label {
+      background-color: #e7f0ff;
+      color: #0056b3;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      user-select: none;
+    }
+    .checkbox-group input[type="checkbox"] {
+      display: none; /* Esconder el checkbox real */
+    }
+    .checkbox-group input[type="checkbox"]:checked + label {
+      background-color: #0056b3;
+      color: white;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #0056b3;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #004a9c;
+    }
+  </style>
+</head>
+<body>
+
+<form id="requestForm">
+  <label for="puesto">Puesto:</label>
+  <input type="number" id="puesto" name="puesto" min="1" required>
+  
+  <label for="tipoCaja">Tipo de Caja:</label>
+  <div class="checkbox-group">
+    <input type="checkbox" id="E1" value="E1">
+    <label for="E1">E1</label>
+
+    <input type="checkbox" id="E2" value="E2">
+    <label for="E2">E2</label>
+
+    <input type="checkbox" id="E3" value="E3">
+    <label for="E3">E3</label>
+
+    <input type="checkbox" id="E4" value="E4">
+    <label for="E4">E4</label>
+
+    <input type="checkbox" id="E5" value="E5">
+    <label for="E5">E5</label>
+
+    <input type="checkbox" id="M1" value="M1">
+    <label for="M1">M1</label>
+
+    <input type="checkbox" id="M2" value="M2">
+    <label for="M2">M2</label>
+
+    <input type="checkbox" id="M3" value="M3">
+    <label for="M3">M3</label>
+
+    <input type="checkbox" id="M4" value="M4">
+    <label for="M4">M4</label>
+
+    <input type="checkbox" id="ETIQUETAS" value="ETIQUETAS">
+    <label for="ETIQUETAS">ETIQUETAS</label>
+
+    <input type="checkbox" id="PAPEL_RELLENO" value="PAPEL RELLENO">
+    <label for="PAPEL_RELLENO">PAPEL RELLENO</label>
+  </div>
+
+  <button type="submit">Solicitar</button>
+</form>
+
+<script>
+  const form = document.getElementById('requestForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const puesto = document.getElementById('puesto').value;
+    const tipoCaja = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+                          .map(checkbox => checkbox.value)
+                          .join(', '); // Convierte las opciones seleccionadas en un string separado por comas
+
+    await fetch('https://script.google.com/macros/s/AKfycbzglP3YC5gcBconYMU541tD4rtfqSuWnOEyoPPmJJUW5uB2rIYgGPqHcdYyFVNuMkm6/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ puesto, tipoCaja })
+    });
+
+    // Desmarcar los checkboxes después de enviar la solicitud
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+
+    // Mantener el valor del puesto ingresado (el campo ya lo retiene por defecto, así que no se necesita código adicional)
+  });
+</script>
+
+</body>
+</html>
