@@ -245,9 +245,6 @@
     }
 
     function playNotification() {
-      // Reproducir el sonido
-      document.getElementById('notificationSound').play();
-
       // Vibrar si el dispositivo es compatible
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200]); // Vibrar en patrón: vibrar-pausa-vibrar
