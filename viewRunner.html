@@ -108,9 +108,6 @@
     </tbody>
   </table>
 
-  <!-- Archivo de sonido -->
-  <audio id="notificationSound" src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_b6039e5e99.mp3" preload="auto"></audio>
-
   <script>
     let currentFilter = 'TODOS';
     let currentHazmatBwsFilter = 'TODOS';
@@ -192,7 +189,7 @@
 
         // Si hay más filas que antes, reproducir sonido y vibrar
         if (newRowCount > previousRowCount) {
-          playNotification(); // Reproduce el sonido y vibra
+           navigator.vibrate(500); // Reproduce el sonido y vibra
         }
 
         previousRowCount = newRowCount; // Actualizar la cantidad de filas anteriores
