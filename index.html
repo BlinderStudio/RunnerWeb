@@ -5,118 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f8ff; /* Fondo azul claro */
-  color: #333;
-  padding: 20px;
-  margin: 0;
-}
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      padding: 20px;
+      margin: 0;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto; /* Centramos el contenido */
-  padding: 0 20px; /* Reducimos márgenes laterales */
-}
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
 
-#selectorsContainer {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 10px; /* Espacio entre los selectores */
-  flex-wrap: nowrap; /* Mantén los selectores en una fila */
-  align-items: center; /* Alinea verticalmente los selectores en el centro */
-}
+    #selectorsContainer {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
 
-.selector-group {
-  flex-grow: 1;
-}
+    .selector-group {
+      flex-grow: 1;
+      min-width: 0;
+    }
 
-#hazmatBwsSelector,
-#filterSelector,
-#intervalSelector {
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #e7f0ff;
-  color: #0056b3;
-  width: 100%;
-}
+    #hazmatBwsSelector,
+    #filterSelector,
+    #intervalSelector {
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #e7f0ff;
+      color: #0056b3;
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-#hazmatBwsSelector {
-  flex: 0 1 40%; /* Tamaño del primer selector */
-}
+    #hazmatBwsSelector {
+      flex: 0 0 40%;
+    }
 
-#filterSelector {
-  flex: 0 1 40%; /* Tamaño del segundo selector */
-}
+    #filterSelector {
+      flex: 0 0 40%;
+    }
 
-#intervalSelectorContainer {
-  flex: 0 1 20%; /* Tamaño del tercer selector */
-}
+    #intervalSelectorContainer {
+      flex: 0 0 20%;
+      min-width: 80px;
+    }
 
-#intervalSelector {
-  width: 100%;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+    th, td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
 
-th, td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
+    th {
+      background-color: #0056b3;
+      color: white;
+    }
 
-th {
-  background-color: #0056b3;
-  color: white;
-}
+    th:last-child {
+      width: 40px; /* Espacio reducido para el tick */
+      color: transparent; /* Mantiene el fondo azul pero sin texto visible */
+    }
 
-.tick-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: green;
-}
+    td:last-child {
+      text-align: center;
+      width: 40px;
+    }
 
-.time-critical {
-  background-color: #ffcccc; /* Rojo claro */
-}
+    th:nth-child(2), td:nth-child(2) {
+      width: 80px; /* Ajuste del ancho de la columna "Puesto" */
+      text-align: center;
+    }
 
-.time-warning {
-  background-color: #ffe4b5; /* Naranja claro */
-}
+    th:nth-child(3), td:nth-child(3) {
+      width: auto; /* Que la columna "Solicitud" (antes "Caja") ocupe el resto del espacio */
+    }
 
-/* Media query para pantallas pequeñas */
-@media (max-width: 768px) {
-  #selectorsContainer {
-    flex-wrap: wrap; /* Permitir que se apilen en pantallas pequeñas si es necesario */
-    gap: 5px; /* Reducir el espacio entre los selectores */
-  }
+    .tick-button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: green;
+      padding: 0;
+    }
 
-  #hazmatBwsSelector,
-  #filterSelector,
-  #intervalSelector {
-    font-size: 12px;
-    padding: 6px;
-  }
+    .time-critical {
+      background-color: #ffcccc;
+    }
 
-  #hazmatBwsSelector,
-  #filterSelector,
-  #intervalSelectorContainer {
-    flex: 1 1 100%; /* Ocupan todo el ancho en una fila cuando no hay suficiente espacio */
-  }
-}
+    .time-warning {
+      background-color: #ffe4b5;
+    }
 
-    
+    /* Media query para pantallas pequeñas (Zebra TC57) */
+    @media (max-width: 480px) {
+      #selectorsContainer {
+        gap: 5px;
+        flex-wrap: nowrap;
+      }
+
+      #hazmatBwsSelector,
+      #filterSelector,
+      #intervalSelector {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+      #hazmatBwsSelector,
+      #filterSelector,
+      #intervalSelectorContainer {
+        flex: 0 0 auto;
+      }
+
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -140,7 +162,7 @@ th {
 
       <div class="selector-group" id="intervalSelectorContainer">
         <select id="intervalSelector">
-          <option value="5000" selected>5s</option> <!-- Predeterminado -->
+          <option value="5000" selected>5s</option>
           <option value="10000">10s</option>
           <option value="15000">15s</option>
         </select>
@@ -152,8 +174,8 @@ th {
         <tr>
           <th>Hora</th>
           <th>Puesto</th>
-          <th>Caja</th>
-          <th>Acción</th>
+          <th>Solicitud</th> <!-- Renombramos la columna "Caja" -->
+          <th></th> <!-- Cabecera en azul sin texto -->
         </tr>
       </thead>
       <tbody id="solicitudesTableBody">
@@ -165,15 +187,13 @@ th {
   <script>
     let currentFilter = 'TODOS';
 let currentHazmatBwsFilter = 'TODOS';
-let currentInterval = 5000; // Valor predeterminado de 5 segundos
+let currentInterval = 5000;
 let intervalId;
-let previousRowCount = 0; // Almacena la cantidad de filas en la última actualización
-const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3"; // URL directa del sonido
+let previousRowCount = 0;
+const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3";
 
-// Cargar el sonido
 const audio = new Audio(soundUrl);
 
-// Manejo del cambio de filtro en los selectores
 document.getElementById('filterSelector').addEventListener('change', (event) => {
   applyFilter(event.target.value, currentHazmatBwsFilter);
 });
@@ -184,8 +204,8 @@ document.getElementById('hazmatBwsSelector').addEventListener('change', (event) 
 
 document.getElementById('intervalSelector').addEventListener('change', (event) => {
   currentInterval = parseInt(event.target.value);
-  clearInterval(intervalId); // Limpiar el intervalo anterior
-  intervalId = setInterval(fetchSolicitudesPendientes, currentInterval); // Establecer el nuevo intervalo
+  clearInterval(intervalId);
+  intervalId = setInterval(fetchSolicitudesPendientes, currentInterval);
 });
 
 function applyFilter(filter, hazmatBwsFilter) {
@@ -203,14 +223,14 @@ function formatTimestamp(timestamp) {
 
 function getRowClass(timestamp) {
   const now = new Date();
-  const timeDifference = (now - new Date(timestamp)) / 1000 / 60; // Diferencia en minutos
+  const timeDifference = (now - new Date(timestamp)) / 1000 / 60;
 
   if (timeDifference > 5) {
-    return 'time-critical'; // Rojo si han pasado más de 5 minutos
+    return 'time-critical';
   } else if (timeDifference > 2) {
-    return 'time-warning'; // Naranja si han pasado más de 2 minutos
+    return 'time-warning';
   } else {
-    return ''; // Sin clase si han pasado menos de 2 minutos
+    return '';
   }
 }
 
@@ -240,7 +260,6 @@ async function fetchSolicitudesPendientes() {
     const tableBody = document.getElementById('solicitudesTableBody');
     const newRowCount = filteredSolicitudes.length;
 
-    // Si hay más filas que antes, reproducir sonido y vibrar
     if (newRowCount > previousRowCount) {
       playNotification();
     }
@@ -261,11 +280,12 @@ async function fetchSolicitudesPendientes() {
       cellPuesto.textContent = solicitud.puesto;
       row.appendChild(cellPuesto);
 
-      const cellCaja = document.createElement('td');
-      cellCaja.textContent = solicitud.caja;
-      row.appendChild(cellCaja);
+      const cellSolicitud = document.createElement('td');
+      cellSolicitud.textContent = solicitud.caja; // Ahora es la columna "Solicitud"
+      row.appendChild(cellSolicitud);
 
       const cellAccion = document.createElement('td');
+      cellAccion.className = 'tick-cell'; // Añadimos una clase para ajustar el estilo
       const tickButton = document.createElement('button');
       tickButton.className = 'tick-button';
       tickButton.innerHTML = '✔️';
@@ -295,15 +315,12 @@ async function deleteSolicitud(puesto, caja) {
   }
 }
 
-async function playNotification() {
-      // Reproducir el sonido
-      audio.play();
-
-      // Vibrar si el dispositivo es compatible
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]); // Vibrar en patrón: vibrar-pausa-vibrar
-      }
-    }
+function playNotification() {
+  audio.play();
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
+  }
+}
 
 window.onload = fetchSolicitudesPendientes;
 intervalId = setInterval(fetchSolicitudesPendientes, currentInterval);
