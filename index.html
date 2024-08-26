@@ -24,10 +24,11 @@
   margin-bottom: 20px;
   gap: 10px; /* Espacio entre los selectores */
   flex-wrap: nowrap; /* Mantén los selectores en una fila */
+  align-items: center; /* Alinea verticalmente los selectores en el centro */
 }
 
 .selector-group {
-  flex: 1;
+  flex-grow: 1;
 }
 
 #hazmatBwsSelector,
@@ -44,15 +45,19 @@
 }
 
 #hazmatBwsSelector {
-  flex: 0 0 35%; /* Ajusta el tamaño del primer selector */
+  flex: 0 1 40%; /* Tamaño del primer selector */
 }
 
 #filterSelector {
-  flex: 0 0 35%; /* Ajusta el tamaño del segundo selector */
+  flex: 0 1 40%; /* Tamaño del segundo selector */
 }
 
 #intervalSelectorContainer {
-  flex: 0 0 20%; /* Ajusta el tamaño del tercer selector */
+  flex: 0 1 20%; /* Tamaño del tercer selector */
+}
+
+#intervalSelector {
+  width: 100%;
 }
 
 table {
@@ -91,30 +96,25 @@ th {
 }
 
 /* Media query para pantallas pequeñas */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   #selectorsContainer {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 5px; /* Reduce el espacio entre los selectores */
-  }
-
-  #hazmatBwsSelector,
-  #filterSelector {
-    flex: 1 1 45%; /* Ambos selectores ocuparán el 45% del espacio disponible */
-  }
-
-  #intervalSelectorContainer {
-    flex: 1 1 10%; /* El selector de segundos ocupa el 10% */
+    flex-wrap: wrap; /* Permitir que se apilen en pantallas pequeñas si es necesario */
+    gap: 5px; /* Reducir el espacio entre los selectores */
   }
 
   #hazmatBwsSelector,
   #filterSelector,
   #intervalSelector {
-    font-size: 12px; /* Reduce el tamaño de fuente para evitar que se corte */
-    padding: 6px; /* Reduce el padding para adaptarse a pantallas pequeñas */
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  #hazmatBwsSelector,
+  #filterSelector,
+  #intervalSelectorContainer {
+    flex: 1 1 100%; /* Ocupan todo el ancho en una fila cuando no hay suficiente espacio */
   }
 }
-
 
     
   </style>
