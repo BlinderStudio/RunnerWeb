@@ -269,7 +269,7 @@ async function fetchSolicitudesPendientes() {
 
 async function deleteSolicitud(puesto, caja) {
   try {
-    const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec?action=delete&puesto=${puesto}&caja=${caja}`;
+    const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzhWFWBqT-YiDMVlXgAmCXopHKl1mlE0YOp7AAM7cRJf_2wFANhG_8x-3YBbI7IyAVL/exec?action=delete&puesto=${puesto}&caja=${caja}`;
 
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error al eliminar la solicitud');
