@@ -5,125 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8ff; /* Fondo azul claro */
-      color: #333;
-      padding: 20px;
-      margin: 0;
-    }
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff; /* Fondo azul claro */
+  color: #333;
+  padding: 20px;
+  margin: 0;
+}
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto; /* Centramos el contenido */
-      padding: 0 20px; /* Reducimos márgenes laterales */
-    }
+.container {
+  max-width: 1200px;
+  margin: 0 auto; /* Centramos el contenido */
+  padding: 0 20px; /* Reducimos márgenes laterales */
+}
 
-    #selectorsContainer {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+#selectorsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 10px; /* Espacio entre los selectores */
+  flex-wrap: nowrap; /* Mantén los selectores en una fila */
+}
 
-    .selector-group {
-      flex: 1;
-      min-width: 200px;
-      margin: 0 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start; /* Alineado a la izquierda */
-    }
+.selector-group {
+  flex: 1;
+}
 
-    label {
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #0056b3;
-    }
+#hazmatBwsSelector,
+#filterSelector,
+#intervalSelector {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #e7f0ff;
+  color: #0056b3;
+  width: 100%;
+}
 
-    select {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px; /* Bordes redondeados */
-      cursor: pointer;
-      background-color: #e7f0ff;
-      color: #0056b3;
-      width: 100%;
-    }
+#hazmatBwsSelector {
+  flex: 0 0 35%; /* Ajusta el tamaño del primer selector */
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+#filterSelector {
+  flex: 0 0 35%; /* Ajusta el tamaño del segundo selector */
+}
 
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
+#intervalSelectorContainer {
+  flex: 0 0 20%; /* Ajusta el tamaño del tercer selector */
+}
 
-    th {
-      background-color: #0056b3;
-      color: white;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-    .tick-button {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      color: green;
-    }
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
 
-    .time-critical {
-      background-color: #ffcccc; /* Rojo claro */
-    }
+th {
+  background-color: #0056b3;
+  color: white;
+}
 
-    .time-warning {
-      background-color: #ffe4b5; /* Naranja claro */
-    }
+.tick-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: green;
+}
 
-    /* Media Query para pantallas más pequeñas */
-    @media (max-width: 768px) {
-      #selectorsContainer {
-        flex-wrap: nowrap;
-        flex-direction: column;
-        align-items: stretch;
-      }
+.time-critical {
+  background-color: #ffcccc; /* Rojo claro */
+}
 
-      .selector-group {
-        width: 100%;
-        margin: 10px 0;
-      }
-    }
+.time-warning {
+  background-color: #ffe4b5; /* Naranja claro */
+}
+
+/* Media query para pantallas pequeñas */
+@media (max-width: 600px) {
+  #selectorsContainer {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 5px; /* Reduce el espacio entre los selectores */
+  }
+
+  #hazmatBwsSelector,
+  #filterSelector {
+    flex: 1 1 45%; /* Ambos selectores ocuparán el 45% del espacio disponible */
+  }
+
+  #intervalSelectorContainer {
+    flex: 1 1 10%; /* El selector de segundos ocupa el 10% */
+  }
+
+  #hazmatBwsSelector,
+  #filterSelector,
+  #intervalSelector {
+    font-size: 12px; /* Reduce el tamaño de fuente para evitar que se corte */
+    padding: 6px; /* Reduce el padding para adaptarse a pantallas pequeñas */
+  }
+}
+
+
+    
   </style>
 </head>
 <body>
   <div class="container">
     <div id="selectorsContainer">
       <div class="selector-group">
-        <label for="hazmatBwsSelector">Nodo</label>
         <select id="hazmatBwsSelector">
-          <option value="TODOS">TODOS</option>
+          <option value="TODOS" selected>ZONA</option>
           <option value="HAZMAT">HAZMAT</option>
           <option value="BWS">BWS</option>
         </select>
       </div>
 
       <div class="selector-group">
-        <label for="filterSelector">Posición</label>
         <select id="filterSelector">
-          <option value="TODOS">TODOS</option>
+          <option value="TODOS" selected>POSICIÓN</option>
           <option value="IZQUIERDA">IZQUIERDA</option>
           <option value="DERECHA">DERECHA</option>
         </select>
       </div>
 
-      <div class="selector-group">
-        <label for="intervalSelector">Actualizar</label>
+      <div class="selector-group" id="intervalSelectorContainer">
         <select id="intervalSelector">
           <option value="5000" selected>5s</option> <!-- Predeterminado -->
           <option value="10000">10s</option>
