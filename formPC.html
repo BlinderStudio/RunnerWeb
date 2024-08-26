@@ -6,40 +6,69 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f0f8ff; /* Fondo azul claro */
+      background-color: #f0f8ff;
       color: #333;
       padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
     form {
       background-color: white;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
-      margin: auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     label {
       font-weight: bold;
       color: #0056b3;
-      display: block;
       margin-top: 10px;
     }
-    input[type="number"], select {
-      width: calc(100% - 24px); /* Ajusta el ancho para que no se salga del contenedor */
+    input[type="number"] {
       padding: 10px;
       margin-top: 5px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
       background-color: #e7f0ff;
       color: #0056b3;
+      text-align: center;
+      width: 100%;
+      max-width: 200px;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .button-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ccc;
+      color: #333;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .button-group button.active {
+      background-color: #0056b3;
+      color: white;
     }
     .checkbox-group {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 5px;
+      justify-content: center;
+      display: none;
     }
     .checkbox-group label {
       background-color: #e7f0ff;
@@ -53,13 +82,13 @@
       user-select: none;
     }
     .checkbox-group input[type="checkbox"] {
-      display: none; /* Esconder el checkbox real */
+      display: none;
     }
     .checkbox-group input[type="checkbox"]:checked + label {
       background-color: #0056b3;
       color: white;
     }
-    button {
+    button[type="submit"] {
       display: block;
       width: 100%;
       padding: 10px;
@@ -70,10 +99,34 @@
       border-radius: 8px;
       cursor: pointer;
       margin-top: 20px;
+      max-width: 300px;
     }
-    button:hover {
+    button[type="submit"]:hover {
       background-color: #004a9c;
     }
+    #statusMessage {
+      margin-top: 10px;
+      color: #0056b3;
+      font-size: 16px;
+      display: none;
+    }
+    .otros-group {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 200px; /* Ajusta el ancho máximo para alinearlo con los demás elementos */
+  text-align: center; /* Centra el contenido dentro del contenedor */
+}
+
+.otros-group input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #e7f0ff;
+  color: #0056b3;
+  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
   </style>
 </head>
 <body>
@@ -82,8 +135,12 @@
   <label for="puesto">Puesto:</label>
   <input type="number" id="puesto" name="puesto" min="1" required>
   
-  <label for="tipoCaja">Tipo de Caja:</label>
-  <div class="checkbox-group">
+  <div class="button-group">
+    <button type="button" id="hazmatButton">H</button>
+    <button type="button" id="bwsButton">B</button>
+  </div>
+
+  <div id="hazmatGroup" class="checkbox-group">
     <input type="checkbox" id="E1" value="E1">
     <label for="E1">E1</label>
 
@@ -118,32 +175,96 @@
     <label for="PAPEL_RELLENO">PAPEL RELLENO</label>
   </div>
 
+  <div id="bwsGroup" class="checkbox-group">
+    <input type="checkbox" id="B1" value="B1">
+    <label for="B1">B1</label>
+
+    <input type="checkbox" id="B2" value="B2">
+    <label for="B2">B2</label>
+
+    <input type="checkbox" id="B3" value="B3">
+    <label for="B3">B3</label>
+
+    <input type="checkbox" id="B5" value="B5">
+    <label for="B5">B5</label>
+
+    <input type="checkbox" id="BEERCAN" value="BEERCAN">
+    <label for="BEERCAN">BEERCAN</label>
+
+    <input type="checkbox" id="ETIQUETAS_BWS" value="ETIQUETAS">
+    <label for="ETIQUETAS_BWS">ETIQUETAS</label>
+
+    <input type="checkbox" id="PAPEL_RELLENO_BWS" value="PAPEL RELLENO">
+    <label for="PAPEL_RELLENO_BWS">PAPEL RELLENO</label>
+  </div>
+
+  <!-- Campo "Otros" -->
+  <div class="otros-group">
+    <label for="otros">Otros:</label>
+    <input type="text" id="otros" name="otros">
+  </div>
+
   <button type="submit">Solicitar</button>
+  <div id="statusMessage">Enviando solicitud...</div>
 </form>
 
 <script>
+  const hazmatButton = document.getElementById('hazmatButton');
+  const bwsButton = document.getElementById('bwsButton');
+  const hazmatGroup = document.getElementById('hazmatGroup');
+  const bwsGroup = document.getElementById('bwsGroup');
+  const statusMessage = document.getElementById('statusMessage');
+
+  hazmatButton.addEventListener('click', () => {
+    hazmatGroup.style.display = 'flex';
+    bwsGroup.style.display = 'none';
+    hazmatButton.classList.add('active');
+    bwsButton.classList.remove('active');
+  });
+
+  bwsButton.addEventListener('click', () => {
+    hazmatGroup.style.display = 'none';
+    bwsGroup.style.display = 'flex';
+    bwsButton.classList.add('active');
+    hazmatButton.classList.remove('active');
+  });
+
   const form = document.getElementById('requestForm');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // Mostrar el mensaje "Enviando solicitud..."
+    statusMessage.style.display = 'block';
+
     const puesto = document.getElementById('puesto').value;
     const tipoCaja = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
                           .map(checkbox => checkbox.value)
-                          .join(', '); // Convierte las opciones seleccionadas en un string separado por comas
+                          .join(', ');
+
+    // Obtener el valor del campo "Otros"
+    const otros = document.getElementById('otros').value.trim();
+
+    // Combinar el valor de los checkboxes con "Otros"
+    const tipoCajaFinal = otros ? `${tipoCaja}, ${otros}` : tipoCaja;
 
     await fetch('https://script.google.com/macros/s/AKfycbzglP3YC5gcBconYMU541tD4rtfqSuWnOEyoPPmJJUW5uB2rIYgGPqHcdYyFVNuMkm6/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ puesto, tipoCaja })
+      body: JSON.stringify({ puesto, tipoCaja: tipoCajaFinal })
     });
 
-    // Desmarcar los checkboxes después de enviar la solicitud
+    // Ocultar el mensaje "Enviando solicitud..." después de completar el envío
+    statusMessage.style.display = 'none';
+
+    // Deseleccionar todos los checkboxes
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
       checkbox.checked = false;
     });
 
-    // Mantener el valor del puesto ingresado (el campo ya lo retiene por defecto, así que no se necesita código adicional)
+    // Limpiar el campo "Otros"
+    document.getElementById('otros').value = '';
+
   });
 </script>
 
