@@ -9,22 +9,37 @@
       background-color: #f0f8ff; /* Fondo azul claro */
       color: #333;
       padding: 20px;
+      margin: 0;
     }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto; /* Centramos el contenido */
+      padding: 0 20px; /* Reducimos márgenes laterales */
+    }
+
     #selectorsContainer {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
+
     .selector-group {
+      flex: 1;
+      min-width: 200px;
+      margin: 0 10px;
       display: flex;
       flex-direction: column;
       align-items: flex-start; /* Alineado a la izquierda */
     }
+
     label {
       margin-bottom: 5px;
       font-weight: bold;
       color: #0056b3;
     }
+
     select {
       padding: 10px 20px;
       font-size: 16px;
@@ -33,7 +48,9 @@
       cursor: pointer;
       background-color: #e7f0ff;
       color: #0056b3;
+      width: 100%;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -41,15 +58,18 @@
       background-color: white;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+
     th, td {
       padding: 10px;
       border: 1px solid #ddd;
       text-align: left;
     }
+
     th {
       background-color: #0056b3;
       color: white;
     }
+
     .tick-button {
       background-color: transparent;
       border: none;
@@ -57,191 +77,210 @@
       font-size: 18px;
       color: green;
     }
+
     .time-critical {
       background-color: #ffcccc; /* Rojo claro */
     }
+
     .time-warning {
       background-color: #ffe4b5; /* Naranja claro */
+    }
+
+    /* Media Query para pantallas más pequeñas */
+    @media (max-width: 768px) {
+      #selectorsContainer {
+        flex-wrap: nowrap;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .selector-group {
+        width: 100%;
+        margin: 10px 0;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="selectorsContainer">
-    <div class="selector-group">
-      <label for="filterSelector">Posición</label>
-      <select id="filterSelector">
-        <option value="TODOS">TODOS</option>
-        <option value="IZQUIERDA">IZQUIERDA</option>
-        <option value="DERECHA">DERECHA</option>
-      </select>
+  <div class="container">
+    <div id="selectorsContainer">
+      <div class="selector-group">
+        <label for="hazmatBwsSelector">Nodo</label>
+        <select id="hazmatBwsSelector">
+          <option value="TODOS">TODOS</option>
+          <option value="HAZMAT">HAZMAT</option>
+          <option value="BWS">BWS</option>
+        </select>
+      </div>
+
+      <div class="selector-group">
+        <label for="filterSelector">Posición</label>
+        <select id="filterSelector">
+          <option value="TODOS">TODOS</option>
+          <option value="IZQUIERDA">IZQUIERDA</option>
+          <option value="DERECHA">DERECHA</option>
+        </select>
+      </div>
+
+      <div class="selector-group">
+        <label for="intervalSelector">Actualizar</label>
+        <select id="intervalSelector">
+          <option value="5000" selected>5s</option> <!-- Predeterminado -->
+          <option value="10000">10s</option>
+          <option value="15000">15s</option>
+        </select>
+      </div>
     </div>
 
-    <div class="selector-group">
-      <label for="hazmatBwsSelector">Nodo</label>
-      <select id="hazmatBwsSelector">
-        <option value="TODOS">TODOS</option>
-        <option value="HAZMAT">HAZMAT</option>
-        <option value="BWS">BWS</option>
-      </select>
-    </div>
-
-    <div class="selector-group">
-      <label for="intervalSelector">Actualizar</label>
-      <select id="intervalSelector">
-        <option value="5000">5s</option>
-        <option value="10000" selected>10s</option> <!-- Predeterminado -->
-        <option value="15000">15s</option>
-      </select>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Puesto</th>
+          <th>Caja</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="solicitudesTableBody">
+        <!-- Aquí se agregarán las filas dinámicamente -->
+      </tbody>
+    </table>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Hora</th>
-        <th>Puesto</th>
-        <th>Caja</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody id="solicitudesTableBody">
-      <!-- Aquí se agregarán las filas dinámicamente -->
-    </tbody>
-  </table>
 
   <script>
     let currentFilter = 'TODOS';
-    let currentHazmatBwsFilter = 'TODOS';
-    let currentInterval = 10000; // Valor predeterminado de 10 segundos
-    let intervalId;
-    let previousRowCount = 0; // Almacena la cantidad de filas en la última actualización
-    const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3"; // URL directa del sonido
+let currentHazmatBwsFilter = 'TODOS';
+let currentInterval = 5000; // Valor predeterminado de 5 segundos
+let intervalId;
+let previousRowCount = 0; // Almacena la cantidad de filas en la última actualización
+const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3"; // URL directa del sonido
 
-    // Cargar el sonido
-    const audio = new Audio(soundUrl);
+// Cargar el sonido
+const audio = new Audio(soundUrl);
 
-    // Manejo del cambio de filtro en los selectores
-    document.getElementById('filterSelector').addEventListener('change', (event) => {
-      applyFilter(event.target.value, currentHazmatBwsFilter);
+// Manejo del cambio de filtro en los selectores
+document.getElementById('filterSelector').addEventListener('change', (event) => {
+  applyFilter(event.target.value, currentHazmatBwsFilter);
+});
+
+document.getElementById('hazmatBwsSelector').addEventListener('change', (event) => {
+  applyFilter(currentFilter, event.target.value);
+});
+
+document.getElementById('intervalSelector').addEventListener('change', (event) => {
+  currentInterval = parseInt(event.target.value);
+  clearInterval(intervalId); // Limpiar el intervalo anterior
+  intervalId = setInterval(fetchSolicitudesPendientes, currentInterval); // Establecer el nuevo intervalo
+});
+
+function applyFilter(filter, hazmatBwsFilter) {
+  currentFilter = filter;
+  currentHazmatBwsFilter = hazmatBwsFilter;
+  fetchSolicitudesPendientes();
+}
+
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function getRowClass(timestamp) {
+  const now = new Date();
+  const timeDifference = (now - new Date(timestamp)) / 1000 / 60; // Diferencia en minutos
+
+  if (timeDifference > 5) {
+    return 'time-critical'; // Rojo si han pasado más de 5 minutos
+  } else if (timeDifference > 2) {
+    return 'time-warning'; // Naranja si han pasado más de 2 minutos
+  } else {
+    return ''; // Sin clase si han pasado menos de 2 minutos
+  }
+}
+
+async function fetchSolicitudesPendientes() {
+  try {
+    const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec';
+
+    const response = await fetch(googleScriptUrl);
+    if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+    const solicitudes = await response.json();
+
+    const filteredSolicitudes = solicitudes.filter(solicitud => {
+      const puesto = parseInt(solicitud.puesto);
+
+      const cumpleFiltroPosicion = currentFilter === 'TODOS' || 
+        (currentFilter === 'IZQUIERDA' && puesto % 2 !== 0) ||
+        (currentFilter === 'DERECHA' && puesto % 2 === 0);
+
+      const cumpleFiltroHazmatBws = currentHazmatBwsFilter === 'TODOS' ||
+        (currentHazmatBwsFilter === 'HAZMAT' && puesto >= 1 && puesto <= 50) ||
+        (currentHazmatBwsFilter === 'BWS' && puesto > 50);
+
+      return cumpleFiltroPosicion && cumpleFiltroHazmatBws;
     });
 
-    document.getElementById('hazmatBwsSelector').addEventListener('change', (event) => {
-      applyFilter(currentFilter, event.target.value);
+    const tableBody = document.getElementById('solicitudesTableBody');
+    const newRowCount = filteredSolicitudes.length;
+
+    // Si hay más filas que antes, reproducir sonido y vibrar
+    if (newRowCount > previousRowCount) {
+      playNotification();
+    }
+
+    previousRowCount = newRowCount;
+
+    tableBody.innerHTML = '';
+
+    filteredSolicitudes.forEach((solicitud) => {
+      const row = document.createElement('tr');
+      row.className = getRowClass(solicitud.timestamp);
+
+      const cellTimestamp = document.createElement('td');
+      cellTimestamp.textContent = formatTimestamp(solicitud.timestamp);
+      row.appendChild(cellTimestamp);
+
+      const cellPuesto = document.createElement('td');
+      cellPuesto.textContent = solicitud.puesto;
+      row.appendChild(cellPuesto);
+
+      const cellCaja = document.createElement('td');
+      cellCaja.textContent = solicitud.caja;
+      row.appendChild(cellCaja);
+
+      const cellAccion = document.createElement('td');
+      const tickButton = document.createElement('button');
+      tickButton.className = 'tick-button';
+      tickButton.innerHTML = '✔️';
+      tickButton.addEventListener('click', async () => {
+        await deleteSolicitud(solicitud.puesto, solicitud.caja);
+      });
+      cellAccion.appendChild(tickButton);
+      row.appendChild(cellAccion);
+
+      tableBody.appendChild(row);
     });
+  } catch (error) {
+    console.error('Error fetching solicitudes:', error);
+  }
+}
 
-    document.getElementById('intervalSelector').addEventListener('change', (event) => {
-      currentInterval = parseInt(event.target.value);
-      clearInterval(intervalId); // Limpiar el intervalo anterior
-      intervalId = setInterval(fetchSolicitudesPendientes, currentInterval); // Establecer el nuevo intervalo
-    });
+async function deleteSolicitud(puesto, caja) {
+  try {
+    const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec?action=delete&puesto=${puesto}&caja=${caja}`;
 
-    function applyFilter(filter, hazmatBwsFilter) {
-      currentFilter = filter;
-      currentHazmatBwsFilter = hazmatBwsFilter;
-      fetchSolicitudesPendientes();
-    }
+    const response = await fetch(googleScriptUrl);
+    if (!response.ok) throw new Error('Error al eliminar la solicitud');
 
-    function formatTimestamp(timestamp) {
-      const date = new Date(timestamp);
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    }
+    fetchSolicitudesPendientes();
+  } catch (error) {
+    console.error('Error deleting solicitud:', error);
+  }
+}
 
-    function getRowClass(timestamp) {
-      const now = new Date();
-      const timeDifference = (now - new Date(timestamp)) / 1000 / 60; // Diferencia en minutos
-
-      if (timeDifference > 5) {
-        return 'time-critical'; // Rojo si han pasado más de 5 minutos
-      } else if (timeDifference > 2) {
-        return 'time-warning'; // Naranja si han pasado más de 2 minutos
-      } else {
-        return ''; // Sin clase si han pasado menos de 2 minutos
-      }
-    }
-
-    async function fetchSolicitudesPendientes() {
-      try {
-        const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec';
-
-        const response = await fetch(googleScriptUrl);
-        if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
-        const solicitudes = await response.json();
-
-        const filteredSolicitudes = solicitudes.filter(solicitud => {
-          const puesto = parseInt(solicitud.puesto);
-
-          const cumpleFiltroPosicion = currentFilter === 'TODOS' || 
-            (currentFilter === 'IZQUIERDA' && puesto % 2 !== 0) ||
-            (currentFilter === 'DERECHA' && puesto % 2 === 0);
-
-          const cumpleFiltroHazmatBws = currentHazmatBwsFilter === 'TODOS' ||
-            (currentHazmatBwsFilter === 'HAZMAT' && puesto >= 1 && puesto <= 50) ||
-            (currentHazmatBwsFilter === 'BWS' && puesto > 50);
-
-          return cumpleFiltroPosicion && cumpleFiltroHazmatBws;
-        });
-
-        const tableBody = document.getElementById('solicitudesTableBody');
-        const newRowCount = filteredSolicitudes.length;
-
-        // Si hay más filas que antes, reproducir sonido y vibrar
-        if (newRowCount > previousRowCount) {
-          playNotification();
-        }
-
-        previousRowCount = newRowCount;
-
-        tableBody.innerHTML = '';
-
-        filteredSolicitudes.forEach((solicitud, index) => {
-          const row = document.createElement('tr');
-          row.className = getRowClass(solicitud.timestamp);
-
-          const cellTimestamp = document.createElement('td');
-          cellTimestamp.textContent = formatTimestamp(solicitud.timestamp);
-          row.appendChild(cellTimestamp);
-
-          const cellPuesto = document.createElement('td');
-          cellPuesto.textContent = solicitud.puesto;
-          row.appendChild(cellPuesto);
-
-          const cellCaja = document.createElement('td');
-          cellCaja.textContent = solicitud.caja;
-          row.appendChild(cellCaja);
-
-          const cellAccion = document.createElement('td');
-          const tickButton = document.createElement('button');
-          tickButton.className = 'tick-button';
-          tickButton.innerHTML = '✔️';
-          tickButton.addEventListener('click', async () => {
-            await deleteSolicitud(index);
-          });
-          cellAccion.appendChild(tickButton);
-          row.appendChild(cellAccion);
-
-          tableBody.appendChild(row);
-        });
-      } catch (error) {
-        console.error('Error fetching solicitudes:', error);
-      }
-    }
-
-    async function deleteSolicitud(index) {
-      try {
-        const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec?action=delete&index=${index}`;
-
-        const response = await fetch(googleScriptUrl);
-        if (!response.ok) throw new Error('Error al eliminar la solicitud');
-
-        fetchSolicitudesPendientes();
-      } catch (error) {
-        console.error('Error deleting solicitud:', error);
-      }
-    }
-
-    function playNotification() {
+async function playNotification() {
       // Reproducir el sonido
       audio.play();
 
@@ -251,8 +290,9 @@
       }
     }
 
-    window.onload = fetchSolicitudesPendientes;
-    intervalId = setInterval(fetchSolicitudesPendientes, currentInterval);
+window.onload = fetchSolicitudesPendientes;
+intervalId = setInterval(fetchSolicitudesPendientes, currentInterval);
+
   </script>
 </body>
 </html>
