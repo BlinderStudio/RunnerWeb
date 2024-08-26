@@ -4,141 +4,142 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8ff;
-      color: #333;
-      padding: 20px;
-      margin: 0;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff;
+  color: #333;
+  padding: 10px; /* Reducimos el padding global */
+  margin: 0;
+}
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+.container {
+  max-width: 100%; /* Usar todo el ancho disponible */
+  margin: 0 auto;
+  padding: 0 10px; /* Reducimos el padding lateral */
+}
 
-    #selectorsContainer {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      gap: 10px;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
+#selectorsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px; /* Reducir el margen inferior */
+  gap: 5px; /* Reducir espacio entre selectores */
+  flex-wrap: nowrap;
+  align-items: center;
+}
 
-    .selector-group {
-      flex-grow: 1;
-      min-width: 0;
-    }
+.selector-group {
+  flex-grow: 1;
+  min-width: 0;
+}
 
-    #hazmatBwsSelector,
-    #filterSelector,
-    #intervalSelector {
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      cursor: pointer;
-      background-color: #e7f0ff;
-      color: #0056b3;
-      width: 100%;
-      box-sizing: border-box;
-    }
+#hazmatBwsSelector,
+#filterSelector,
+#intervalSelector {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #e7f0ff;
+  color: #0056b3;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-    #hazmatBwsSelector {
-      flex: 0 0 40%;
-    }
+#hazmatBwsSelector {
+  flex: 0 0 40%;
+}
 
-    #filterSelector {
-      flex: 0 0 40%;
-    }
+#filterSelector {
+  flex: 0 0 40%;
+}
 
-    #intervalSelectorContainer {
-      flex: 0 0 20%;
-      min-width: 80px;
-    }
+#intervalSelectorContainer {
+  flex: 0 0 20%;
+  min-width: 70px;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+table {
+  width: 100%; /* La tabla ahora ocupará todo el ancho disponible */
+  border-collapse: collapse;
+  margin-top: 10px; /* Reducir el margen superior */
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-    th, td {
-      padding: 8px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
+th, td {
+  padding: 6px; /* Reducir padding en celdas */
+  border: 1px solid #ddd;
+  text-align: left;
+}
 
-    th {
-      background-color: #0056b3;
-      color: white;
-    }
+th {
+  background-color: #0056b3;
+  color: white;
+}
 
-    th:last-child {
-      width: 40px; /* Espacio reducido para el tick */
-      color: transparent; /* Mantiene el fondo azul pero sin texto visible */
-    }
+th:last-child {
+  width: 40px; /* Espacio reducido para el tick */
+  color: transparent; /* Mantiene el fondo azul pero sin texto visible */
+}
 
-    td:last-child {
-      text-align: center;
-      width: 40px;
-    }
+td:last-child {
+  text-align: center;
+  width: 40px;
+}
 
-    th:nth-child(2), td:nth-child(2) {
-      width: 80px; /* Ajuste del ancho de la columna "Puesto" */
-      text-align: center;
-    }
+th:nth-child(2), td:nth-child(2) {
+  width: 80px;
+  text-align: center;
+}
 
-    th:nth-child(3), td:nth-child(3) {
-      width: auto; /* Que la columna "Solicitud" (antes "Caja") ocupe el resto del espacio */
-    }
+th:nth-child(3), td:nth-child(3) {
+  width: auto; /* Que la columna "Solicitud" ocupe el resto del espacio */
+}
 
-    .tick-button {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      color: green;
-      padding: 0;
-    }
+.tick-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: green;
+  padding: 0;
+}
 
-    .time-critical {
-      background-color: #ffcccc;
-    }
+.time-critical {
+  background-color: #ffcccc;
+}
 
-    .time-warning {
-      background-color: #ffe4b5;
-    }
+.time-warning {
+  background-color: #ffe4b5;
+}
 
-    /* Media query para pantallas pequeñas (Zebra TC57) */
-    @media (max-width: 480px) {
-      #selectorsContainer {
-        gap: 5px;
-        flex-wrap: nowrap;
-      }
+/* Media query para pantallas pequeñas (Zebra TC57) */
+@media (max-width: 480px) {
+  #selectorsContainer {
+    gap: 3px;
+    flex-wrap: nowrap;
+  }
 
-      #hazmatBwsSelector,
-      #filterSelector,
-      #intervalSelector {
-        font-size: 14px;
-        padding: 8px;
-      }
+  #hazmatBwsSelector,
+  #filterSelector,
+  #intervalSelector {
+    font-size: 14px;
+    padding: 8px;
+  }
 
-      #hazmatBwsSelector,
-      #filterSelector,
-      #intervalSelectorContainer {
-        flex: 0 0 auto;
-      }
+  #hazmatBwsSelector,
+  #filterSelector,
+  #intervalSelectorContainer {
+    flex: 0 0 auto;
+  }
 
-      th, td {
-        font-size: 12px;
-        padding: 6px;
-      }
-    }
+  th, td {
+    font-size: 12px;
+    padding: 4px;
+  }
+}
+
   </style>
 </head>
 <body>
