@@ -130,6 +130,21 @@ th:nth-child(3), td:nth-child(3) {
   padding: 0;
 }
 
+#refreshButton {
+  padding: 2px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #0056b3;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center; /* Centra el contenido verticalmente   
+}
+
+.refresh-icon {
+  margin-right: 5px;
+}
+
 .time-critical {
   background-color: #ffcccc;
 }
@@ -155,6 +170,8 @@ th:nth-child(3), td:nth-child(3) {
     font-size: 14px;
     padding: 8px;
   }
+  
+  
 
   #hazmatBwsSelector,
   #filterSelector,
@@ -204,6 +221,11 @@ th:nth-child(3), td:nth-child(3) {
           <option value="15000">15s</option>
         </select>
       </div>
+	  <div class="selector-group">
+  <button id="refreshButton">
+    <i class="refresh-icon"></i>🔄
+  </button>
+</div>
     </div>
 
     <table>
@@ -236,6 +258,10 @@ let alarm = new Audio('https://github.com/BlinderStudio/RunnerWeb/raw/main/alarm
 let isAudioPlaying = false;
 
 const audio = new Audio(soundUrl);
+
+document.getElementById('refreshButton').addEventListener('click', () => {
+  location.reload();
+});
 
 document.getElementById('filterSelector').addEventListener('change', (event) => {
   applyFilter(event.target.value, currentHazmatBwsFilter);
