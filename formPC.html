@@ -254,15 +254,6 @@
       body: JSON.stringify({ puesto, tipoCaja: tipoCajaFinal })
     });
 
-    const workstationInput = document.getElementById('frm_topbar:workstationId');
-
-if (workstationInput) {
-  // Si existe, copiar el valor al input 'puesto'
-  const puestoInput = document.getElementById('puesto');
-  puestoInput.value = workstationInput.value;
-} else {
-  console.error('No se encontró el input con ID frm_topbar:workstationId');
-}
 
     // Ocultar el mensaje "Enviando solicitud..." después de completar el envío
     statusMessage.style.display = 'none';
