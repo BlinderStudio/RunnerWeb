@@ -18,6 +18,16 @@ body {
   padding: 0 10px;
 }
 
+#criticalRequestPopup {
+    display: none !important; /* Use !important for higher specificity */
+}
+
+@media (max-width: 480px) {
+    #criticalRequestPopup {
+        display: block !important; /* Ensure it overrides other rules */
+    }
+}
+
 #selectorsContainer {
   display: flex;
   justify-content: space-between;
