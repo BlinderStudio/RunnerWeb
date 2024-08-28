@@ -139,6 +139,10 @@ th:nth-child(3), td:nth-child(3) {
   background-color: #ffe4b5;
 }
 
+#criticalRequestPopup {
+    display: none; /* Oculta el popup por defecto */
+}
+
 /* Media query para pantallas pequeñas (Zebra TC57) */
 @media (max-width: 480px) {
   #selectorsContainer {
@@ -219,7 +223,7 @@ th:nth-child(3), td:nth-child(3) {
   </div>
 
   <script>
-    let currentFilter = 'TODOS';
+let currentFilter = 'TODOS';
 let currentHazmatBwsFilter = 'TODOS';
 let currentInterval = 5000;
 let intervalId;
@@ -227,6 +231,7 @@ let previousRowCount = 0;
 const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3";
 let shownPopupForPuesto0 = new Set();
 let hasShownPopup = false;
+let hasExistingPuestoZero = false;
 let alarm = new Audio('https://github.com/BlinderStudio/RunnerWeb/raw/main/alarm.mp3');
 
 let isAudioPlaying = false;
@@ -273,7 +278,9 @@ function getRowClass(timestamp) {
   }
 }
 
-
+function hasPuestoCero(solicitudes) {
+  return solicitudes.some(solicitud => solicitud.puesto === 0);
+}
 
 async function fetchSolicitudesPendientes() {
   try {
@@ -301,19 +308,20 @@ async function fetchSolicitudesPendientes() {
     const newRowCount = filteredSolicitudes.length;
 
     if (newRowCount > previousRowCount) {
-      playNotification();
-    }
+    playNotification();
 
-
-	if (newRowCount > previousRowCount) {
-      const hasPuestoZero = filteredSolicitudes.some(item => item.puesto === 0);
-      if (hasPuestoZero && !hasShownPopup) {
-        criticalRequestPopup.style.display = 'flex';
-        audio.play();
-        hasShownPopup = true;
-		playAlarm();
-      }
+    // Llamamos a la función para detectar si hay un puesto 0
+    if (hasPuestoCero(filteredSolicitudes) && !hasExistingPuestoZero) {
+      mostrarPopup();
+	  playAlarm();
+      hasExistingPuestoZero = true; // Actualizamos el estado para la próxima iteración
     }
+  } else {
+    // Si el número de filas ha disminuido, comprobamos si ya no hay puestos 0
+    if (!hasPuestoCero(filteredSolicitudes)) {
+      hasExistingPuestoZero = false; // Reiniciamos solo si no hay puestos 0
+    }
+  }
 	
     previousRowCount = newRowCount;
 
@@ -354,6 +362,12 @@ async function fetchSolicitudesPendientes() {
   }
       
   
+}
+
+function mostrarPopup() {
+  criticalRequestPopup.style.display = 'flex';
+  audio.play();
+  hasShownPopup = true;
 }
 
 function playAlarm() {
