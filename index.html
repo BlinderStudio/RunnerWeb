@@ -225,6 +225,11 @@ let currentInterval = 5000;
 let intervalId;
 let previousRowCount = 0;
 const soundUrl = "https://github.com/BlinderStudio/RunnerWeb/raw/main/beep.mp3";
+let shownPopupForPuesto0 = new Set();
+let hasShownPopup = false;
+let alarm = new Audio('https://github.com/BlinderStudio/RunnerWeb/raw/main/alarm.mp3');
+
+let isAudioPlaying = false;
 
 const audio = new Audio(soundUrl);
 
@@ -268,10 +273,11 @@ function getRowClass(timestamp) {
   }
 }
 
+
+
 async function fetchSolicitudesPendientes() {
   try {
     const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec';
-
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error en la respuesta del servidor');
 
@@ -298,6 +304,17 @@ async function fetchSolicitudesPendientes() {
       playNotification();
     }
 
+
+	if (newRowCount > previousRowCount) {
+      const hasPuestoZero = filteredSolicitudes.some(item => item.puesto === 0);
+      if (hasPuestoZero && !hasShownPopup) {
+        criticalRequestPopup.style.display = 'flex';
+        audio.play();
+        hasShownPopup = true;
+		playAlarm();
+      }
+    }
+	
     previousRowCount = newRowCount;
 
     tableBody.innerHTML = '';
@@ -329,28 +346,37 @@ async function fetchSolicitudesPendientes() {
       cellAccion.appendChild(tickButton);
       row.appendChild(cellAccion);
 
-      if (solicitud.puesto === 0 && !hasShownPopup) {
-      criticalRequestPopup.style.display = 'flex';
-      audio.play(); // Play the sound alert
-      hasShownPopup = true; // Set flag to prevent repeated popups
-      }
-
+	
       tableBody.appendChild(row);
     });
   } catch (error) {
     console.error('Error fetching solicitudes:', error);
   }
+      
+  
 }
 
-    document.getElementById('popupCloseButton').addEventListener('click', () => {
-  criticalRequestPopup.style.display = 'none';
-  hasShownPopup = false; // Reset flag for future occurrences
+function playAlarm() {
+  alarm.loop = true;
+  alarm.play();
+  isAudioPlaying = true;
+}
+
+function stopAlarm() {
+  alarm.pause();
+  alarm.currentTime = 0;
+  isAudioPlaying = false;
+}
+
+document.getElementById('popupCloseButton').addEventListener('click', () => {
+  criticalRequestPopup.style.display = 'none';  
+  hasShownPopup = false;
+  stopAlarm();
 });
 
 async function deleteSolicitud(puesto, caja) {
   try {
     const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzhWFWBqT-YiDMVlXgAmCXopHKl1mlE0YOp7AAM7cRJf_2wFANhG_8x-3YBbI7IyAVL/exec?action=delete&puesto=${puesto}&caja=${caja}`;
-
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error al eliminar la solicitud');
 
@@ -366,6 +392,7 @@ function playNotification() {
     navigator.vibrate([200, 100, 200]);
   }
 }
+
 
 window.onload = fetchSolicitudesPendientes;
 intervalId = setInterval(fetchSolicitudesPendientes, currentInterval);
