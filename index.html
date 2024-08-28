@@ -258,6 +258,13 @@ async function fetchSolicitudesPendientes() {
         (currentHazmatBwsFilter === 'HAZMAT' && puesto >= 1 && puesto <= 50) ||
         (currentHazmatBwsFilter === 'BWS' && puesto > 50);
 
+
+      if (solicitud.puesto === 0) {
+      criticalPopup.style.display = 'flex';
+      audio.play(); // Reproducir el sonido de alerta
+      }
+      
+
       return cumpleFiltroPosicion && cumpleFiltroHazmatBws;
     });
 
