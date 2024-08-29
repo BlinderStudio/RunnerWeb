@@ -25,6 +25,8 @@
       flex-direction: column;
       align-items: center;
     }
+	
+	
     label {
       font-weight: bold;
       color: #0056b3;
@@ -138,8 +140,9 @@
   <div class="button-group">
     <button type="button" id="hazmatButton">H</button>
     <button type="button" id="bwsButton">B</button>
-    <button type="button" id="trabajo">TRABAJO</button>
   </div>
+  
+  
 
   <div id="hazmatGroup" class="checkbox-group">
     <input type="checkbox" id="E1" value="E1">
@@ -174,6 +177,9 @@
 
     <input type="checkbox" id="PAPEL_RELLENO" value="PAPEL RELLENO">
     <label for="PAPEL_RELLENO">PAPEL RELLENO</label>
+	
+	<input type="checkbox" id="TRABAJO" value="TRABAJO">
+    <label for="TRABAJO">TRABAJO</label>
   </div>
 
   <div id="bwsGroup" class="checkbox-group">
@@ -197,13 +203,16 @@
 
     <input type="checkbox" id="PAPEL_RELLENO_BWS" value="PAPEL RELLENO">
     <label for="PAPEL_RELLENO_BWS">PAPEL RELLENO</label>
+	
+	<input type="checkbox" id="TRABAJO" value="TRABAJO">
+    <label for="TRABAJO">TRABAJO</label>
   </div>
 
-  <!-- Campo "Otros" -->
   <div class="otros-group">
     <label for="otros">Otros:</label>
     <input type="text" id="otros" name="otros">
   </div>
+  
 
   <button type="submit">Solicitar</button>
   <div id="statusMessage">Enviando solicitud...</div>
@@ -212,6 +221,7 @@
 <script>
   const hazmatButton = document.getElementById('hazmatButton');
   const bwsButton = document.getElementById('bwsButton');
+  const trabajoButton = document.getElementById('trabajoButton');
   const hazmatGroup = document.getElementById('hazmatGroup');
   const bwsGroup = document.getElementById('bwsGroup');
   const statusMessage = document.getElementById('statusMessage');
@@ -221,6 +231,7 @@
     bwsGroup.style.display = 'none';
     hazmatButton.classList.add('active');
     bwsButton.classList.remove('active');
+	trabajoButton.classList.remove('active');
   });
 
   bwsButton.addEventListener('click', () => {
@@ -228,13 +239,15 @@
     bwsGroup.style.display = 'flex';
     bwsButton.classList.add('active');
     hazmatButton.classList.remove('active');
+    trabajoButton.classList.remove('active');
+
   });
+  
 
   const form = document.getElementById('requestForm');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Mostrar el mensaje "Enviando solicitud..."
     statusMessage.style.display = 'block';
 
     const puesto = document.getElementById('puesto').value;
@@ -244,6 +257,7 @@
 
     // Obtener el valor del campo "Otros"
     const otros = document.getElementById('otros').value.trim();
+	
 
     // Combinar el valor de los checkboxes con "Otros"
     const tipoCajaFinal = otros ? `${tipoCaja}, ${otros}` : tipoCaja;
