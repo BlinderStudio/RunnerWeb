@@ -25,8 +25,6 @@
       flex-direction: column;
       align-items: center;
     }
-	
-	
     label {
       font-weight: bold;
       color: #0056b3;
@@ -113,22 +111,22 @@
       display: none;
     }
     .otros-group {
-  margin-top: 20px;
-  width: 100%;
-  max-width: 200px; /* Ajusta el ancho máximo para alinearlo con los demás elementos */
-  text-align: center; /* Centra el contenido dentro del contenedor */
-}
+      margin-top: 20px;
+      width: 100%;
+      max-width: 200px; /* Ajusta el ancho máximo para alinearlo con los demás elementos */
+      text-align: center; /* Centra el contenido dentro del contenedor */
+    }
 
-.otros-group input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-  background-color: #e7f0ff;
-  color: #0056b3;
-  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
-}
+    .otros-group input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #e7f0ff;
+      color: #0056b3;
+      box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    }
   </style>
 </head>
 <body>
@@ -140,10 +138,9 @@
   <div class="button-group">
     <button type="button" id="hazmatButton">H</button>
     <button type="button" id="bwsButton">B</button>
+    <button type="button" id="trabajoButton">TRABAJO</button>
   </div>
   
-  
-
   <div id="hazmatGroup" class="checkbox-group">
     <input type="checkbox" id="E1" value="E1">
     <label for="E1">E1</label>
@@ -177,9 +174,6 @@
 
     <input type="checkbox" id="PAPEL_RELLENO" value="PAPEL RELLENO">
     <label for="PAPEL_RELLENO">PAPEL RELLENO</label>
-	
-	<input type="checkbox" id="TRABAJO" value="TRABAJO">
-    <label for="TRABAJO">TRABAJO</label>
   </div>
 
   <div id="bwsGroup" class="checkbox-group">
@@ -203,9 +197,6 @@
 
     <input type="checkbox" id="PAPEL_RELLENO_BWS" value="PAPEL RELLENO">
     <label for="PAPEL_RELLENO_BWS">PAPEL RELLENO</label>
-	
-	<input type="checkbox" id="TRABAJO" value="TRABAJO">
-    <label for="TRABAJO">TRABAJO</label>
   </div>
 
   <div class="otros-group">
@@ -231,7 +222,7 @@
     bwsGroup.style.display = 'none';
     hazmatButton.classList.add('active');
     bwsButton.classList.remove('active');
-	trabajoButton.classList.remove('active');
+    trabajoButton.classList.remove('active');
   });
 
   bwsButton.addEventListener('click', () => {
@@ -240,9 +231,15 @@
     bwsButton.classList.add('active');
     hazmatButton.classList.remove('active');
     trabajoButton.classList.remove('active');
-
   });
-  
+
+  trabajoButton.addEventListener('click', () => {
+    hazmatGroup.style.display = 'none';
+    bwsGroup.style.display = 'none';
+    trabajoButton.classList.add('active');
+    hazmatButton.classList.remove('active');
+    bwsButton.classList.remove('active');
+  });
 
   const form = document.getElementById('requestForm');
   form.addEventListener('submit', async (e) => {
@@ -251,16 +248,21 @@
     statusMessage.style.display = 'block';
 
     const puesto = document.getElementById('puesto').value;
-    const tipoCaja = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+    let tipoCaja = '';
+
+    if (trabajoButton.classList.contains('active')) {
+      tipoCaja = 'TRABAJO';
+    } else {
+      tipoCaja = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
                           .map(checkbox => checkbox.value)
                           .join(', ');
+    }
 
     // Obtener el valor del campo "Otros"
     const otros = document.getElementById('otros').value.trim();
-	
 
-    // Combinar el valor de los checkboxes con "Otros"
-    const tipoCajaFinal = otros ? `${tipoCaja}, ${otros}` : tipoCaja;
+    // Si el campo de checkboxes está vacío, no se añade una coma antes del valor de "Otros"
+    let tipoCajaFinal = tipoCaja ? `${tipoCaja}${otros ? ', ' + otros : ''}` : otros;
 
     await fetch('https://script.google.com/macros/s/AKfycbzglP3YC5gcBconYMU541tD4rtfqSuWnOEyoPPmJJUW5uB2rIYgGPqHcdYyFVNuMkm6/exec', {
       method: 'POST',
@@ -268,7 +270,6 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ puesto, tipoCaja: tipoCajaFinal })
     });
-
 
     // Ocultar el mensaje "Enviando solicitud..." después de completar el envío
     statusMessage.style.display = 'none';
@@ -281,6 +282,10 @@
     // Limpiar el campo "Otros"
     document.getElementById('otros').value = '';
 
+    // Quitar la selección de los botones
+    hazmatButton.classList.remove('active');
+    bwsButton.classList.remove('active');
+    trabajoButton.classList.remove('active');
   });
 </script>
 
