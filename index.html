@@ -130,6 +130,19 @@ th:nth-child(3), td:nth-child(3) {
   padding: 0;
 }
 
+.priority-1 {
+  background-color: #ffcccc; /* Rojo claro para prioridad alta */
+}
+
+.priority-2 {
+  background-color: #ffe4b5; /* Naranja claro para prioridad media */
+}
+
+.priority-3 {
+  background-color: #e6ffe6; /* Verde claro para prioridad baja */
+}
+
+
 #refreshButton {
   padding: 2px;
   font-size: 22px;
@@ -232,13 +245,13 @@ th:nth-child(3), td:nth-child(3) {
       <thead>
         <tr>
           <th>Hora</th>
-          <th>Puesto</th>
-          <th>Solicitud</th> <!-- Renombramos la columna "Caja" -->
-          <th></th> <!-- Cabecera en azul sin texto -->
+		  <th>Puesto</th>
+          <th>Solicitud</th>
+          <th></th>
+<th></th>		  <!-- Cabecera en azul sin texto -->
         </tr>
       </thead>
       <tbody id="solicitudesTableBody">
-        <!-- Aquí se agregarán las filas dinámicamente -->
       </tbody>
     </table>
   </div>
@@ -258,6 +271,37 @@ let alarm = new Audio('https://github.com/BlinderStudio/RunnerWeb/raw/main/alarm
 let isAudioPlaying = false;
 
 const audio = new Audio(soundUrl);
+
+
+function getPriority(solicitud) {
+    const puesto = parseInt(solicitud.puesto);
+    if (solicitud.caja === "TRABAJO") {
+      return 2;
+    } else if (puesto === 0) {
+      return 1;
+    } else {
+      return 3;
+    }
+  }
+
+  function formatPriority(priority) {
+    switch (priority) {
+      case 1:
+        return "1";
+      case 2:
+        return "2";
+      case 3:
+        return "3";
+      default:
+        return "Desconocida";
+    }
+  }
+  
+  function compareByPriority(a, b) {
+  const priorityA = getPriority(a);
+  const priorityB = getPriority(b);
+  return priorityA - priorityB; // Ordenar de mayor a menor prioridad
+}
 
 document.getElementById('refreshButton').addEventListener('click', () => {
   location.reload();
@@ -307,12 +351,16 @@ function hasPuestoCero(solicitudes) {
   return solicitudes.some(solicitud => solicitud.puesto === 0);
 }
 
+let hasPlayedSoundForTrabajo = false;
+let hasTrabajoInList = false;
+
+
 async function fetchSolicitudesPendientes() {
   try {
     const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec';
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
+	
     const solicitudes = await response.json();
 
     const filteredSolicitudes = solicitudes.filter(solicitud => {
@@ -351,10 +399,13 @@ async function fetchSolicitudesPendientes() {
     previousRowCount = newRowCount;
 
     tableBody.innerHTML = '';
+	
+	filteredSolicitudes.sort(compareByPriority);
 
     filteredSolicitudes.forEach((solicitud) => {
       const row = document.createElement('tr');
       row.className = getRowClass(solicitud.timestamp);
+	  
 
       const cellTimestamp = document.createElement('td');
       cellTimestamp.textContent = formatTimestamp(solicitud.timestamp);
@@ -367,6 +418,24 @@ async function fetchSolicitudesPendientes() {
       const cellSolicitud = document.createElement('td');
       cellSolicitud.textContent = solicitud.caja; // Ahora es la columna "Solicitud"
       row.appendChild(cellSolicitud);
+	  
+	 const cellPriority = document.createElement('td');
+	 const priority = getPriority(solicitud);
+	 cellPriority.textContent = formatPriority(priority);
+	 row.className = `priority-${priority}`;
+	 row.appendChild(cellPriority);
+	 
+	if (solicitud.caja === "TRABAJO" && priority === 2) {
+    if (!hasPlayedSoundForTrabajo) {
+      console.log("Playing sound for TRABAJO");
+      playNotification2();
+      navigator.vibrate([200, 100, 200]);
+      hasPlayedSoundForTrabajo = true;
+    }
+    hasTrabajoInList = true;
+  } else {
+    console.log("Not TRABAJO or priority 2");
+  }	
 
       const cellAccion = document.createElement('td');
       cellAccion.className = 'tick-cell'; // Añadimos una clase para ajustar el estilo
@@ -376,6 +445,7 @@ async function fetchSolicitudesPendientes() {
       tickButton.addEventListener('click', async () => {
         await deleteSolicitud(solicitud.puesto, solicitud.caja);
       });
+	  
       cellAccion.appendChild(tickButton);
       row.appendChild(cellAccion);
 
@@ -385,8 +455,16 @@ async function fetchSolicitudesPendientes() {
   } catch (error) {
     console.error('Error fetching solicitudes:', error);
   }
-      
+  if (!hasTrabajoInList) {
+  console.log("Resetting hasPlayedSoundForTrabajo");
+  hasPlayedSoundForTrabajo = false;
+}   
   
+}
+
+function playNotification2() {
+  const newAudio = new Audio('https://github.com/BlinderStudio/RunnerWeb/raw/main/trabajo.mp3'); // Replace with your sound URL
+  newAudio.play();
 }
 
 function mostrarPopup() {
@@ -418,8 +496,8 @@ async function deleteSolicitud(puesto, caja) {
     const googleScriptUrl = `https://script.google.com/macros/s/AKfycbzhWFWBqT-YiDMVlXgAmCXopHKl1mlE0YOp7AAM7cRJf_2wFANhG_8x-3YBbI7IyAVL/exec?action=delete&puesto=${puesto}&caja=${caja}`;
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error al eliminar la solicitud');
-
-    fetchSolicitudesPendientes();
+	hasPlayedSoundForTrabajo = false;
+  hasTrabajoInList = false;
   } catch (error) {
     console.error('Error deleting solicitud:', error);
   }
