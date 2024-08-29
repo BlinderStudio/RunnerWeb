@@ -130,6 +130,37 @@ th:nth-child(3), td:nth-child(3) {
   padding: 0;
 }
 
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  max-width: 300px;
+  width: 90%;
+}
+
+.popup-content p {
+  color: #0056b3; /* Color azul del texto */
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-size: 18px; /* Ajusta el tamaño del texto */
+}
+
+.popup-content button {
+  background-color: #0056b3; /* Color de fondo azul */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.popup-content button:hover {
+  background-color: #004a9c; /* Color al pasar el mouse por encima */
+}
+
 .priority-1 {
   background-color: #ffcccc; /* Rojo claro para prioridad alta */
 }
@@ -272,6 +303,40 @@ let isAudioPlaying = false;
 
 const audio = new Audio(soundUrl);
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    console.log('Wake Lock active');
+
+    wakeLock.addEventListener('release', () => {
+      console.log('Wake Lock released');
+    });
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    requestWakeLock();
+  }
+});
+
+// Solicitar Wake Lock al cargar la página
+window.addEventListener('load', requestWakeLock);
+
+// Liberar el Wake Lock antes de cerrar la página
+window.addEventListener('beforeunload', releaseWakeLock);
+
 
 function getPriority(solicitud) {
     const puesto = parseInt(solicitud.puesto);
@@ -360,9 +425,10 @@ async function fetchSolicitudesPendientes() {
     const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzBPsf7sdS4CxmV4NxPhfD1d5Dyj-dFew9ADVjeugKhxtvg9QkIlnzgaUnMuzh08bYU/exec';
     const response = await fetch(googleScriptUrl);
     if (!response.ok) throw new Error('Error en la respuesta del servidor');
-	
+    
     const solicitudes = await response.json();
 
+    // Filtrar solicitudes según los criterios seleccionados
     const filteredSolicitudes = solicitudes.filter(solicitud => {
       const puesto = parseInt(solicitud.puesto);
 
@@ -377,35 +443,41 @@ async function fetchSolicitudesPendientes() {
       return cumpleFiltroPosicion && cumpleFiltroHazmatBws;
     });
 
+    // Asegurarse de que Puesto 0 siempre esté presente
+    const puestoCero = solicitudes.find(solicitud => solicitud.puesto === 0);
+    if (puestoCero && !filteredSolicitudes.includes(puestoCero)) {
+      filteredSolicitudes.unshift(puestoCero);
+    }
+
     const tableBody = document.getElementById('solicitudesTableBody');
     const newRowCount = filteredSolicitudes.length;
 
     if (newRowCount > previousRowCount) {
-    playNotification();
+      playNotification();
 
-    // Llamamos a la función para detectar si hay un puesto 0
-    if (hasPuestoCero(filteredSolicitudes) && !hasExistingPuestoZero) {
-      mostrarPopup();
-	  playAlarm();
-      hasExistingPuestoZero = true; // Actualizamos el estado para la próxima iteración
+      // Llamamos a la función para detectar si hay un puesto 0
+      if (hasPuestoCero(filteredSolicitudes) && !hasExistingPuestoZero) {
+        mostrarPopup();
+        playAlarm();
+        hasExistingPuestoZero = true; // Actualizamos el estado para la próxima iteración
+      }
+    } else {
+      // Si el número de filas ha disminuido, comprobamos si ya no hay puestos 0
+      if (!hasPuestoCero(filteredSolicitudes)) {
+        hasExistingPuestoZero = false; // Reiniciamos solo si no hay puestos 0
+      }
     }
-  } else {
-    // Si el número de filas ha disminuido, comprobamos si ya no hay puestos 0
-    if (!hasPuestoCero(filteredSolicitudes)) {
-      hasExistingPuestoZero = false; // Reiniciamos solo si no hay puestos 0
-    }
-  }
-	
+    
     previousRowCount = newRowCount;
 
     tableBody.innerHTML = '';
-	
-	filteredSolicitudes.sort(compareByPriority);
+    
+    filteredSolicitudes.sort(compareByPriority);
 
     filteredSolicitudes.forEach((solicitud) => {
       const row = document.createElement('tr');
       row.className = getRowClass(solicitud.timestamp);
-	  
+      
 
       const cellTimestamp = document.createElement('td');
       cellTimestamp.textContent = formatTimestamp(solicitud.timestamp);
@@ -418,24 +490,24 @@ async function fetchSolicitudesPendientes() {
       const cellSolicitud = document.createElement('td');
       cellSolicitud.textContent = solicitud.caja; // Ahora es la columna "Solicitud"
       row.appendChild(cellSolicitud);
-	  
-	 const cellPriority = document.createElement('td');
-	 const priority = getPriority(solicitud);
-	 cellPriority.textContent = formatPriority(priority);
-	 row.className = `priority-${priority}`;
-	 row.appendChild(cellPriority);
-	 
-	if (solicitud.caja === "TRABAJO" && priority === 2) {
-    if (!hasPlayedSoundForTrabajo) {
-      console.log("Playing sound for TRABAJO");
-      playNotification2();
-      navigator.vibrate([200, 100, 200]);
-      hasPlayedSoundForTrabajo = true;
-    }
-    hasTrabajoInList = true;
-  } else {
-    console.log("Not TRABAJO or priority 2");
-  }	
+      
+      const cellPriority = document.createElement('td');
+      const priority = getPriority(solicitud);
+      cellPriority.textContent = formatPriority(priority);
+      row.className = `priority-${priority}`;
+      row.appendChild(cellPriority);
+      
+      if (solicitud.caja === "TRABAJO" && priority === 2) {
+        if (!hasPlayedSoundForTrabajo) {
+          console.log("Playing sound for TRABAJO");
+          playNotification2();
+          navigator.vibrate([200, 100, 200]);
+          hasPlayedSoundForTrabajo = true;
+        }
+        hasTrabajoInList = true;
+      } else {
+        console.log("Not TRABAJO or priority 2");
+      }  
 
       const cellAccion = document.createElement('td');
       cellAccion.className = 'tick-cell'; // Añadimos una clase para ajustar el estilo
@@ -445,21 +517,21 @@ async function fetchSolicitudesPendientes() {
       tickButton.addEventListener('click', async () => {
         await deleteSolicitud(solicitud.puesto, solicitud.caja);
       });
-	  
+      
       cellAccion.appendChild(tickButton);
       row.appendChild(cellAccion);
 
-	
+    
       tableBody.appendChild(row);
     });
   } catch (error) {
     console.error('Error fetching solicitudes:', error);
   }
-  if (!hasTrabajoInList) {
-  console.log("Resetting hasPlayedSoundForTrabajo");
-  hasPlayedSoundForTrabajo = false;
-}   
   
+  if (!hasTrabajoInList) {
+    console.log("Resetting hasPlayedSoundForTrabajo");
+    hasPlayedSoundForTrabajo = false;
+  }   
 }
 
 function playNotification2() {
